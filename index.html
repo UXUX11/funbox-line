@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funbox / 來玩聚 LINE 官方帳號一鍵加好友</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 15px; color: #333; }
+        h1 { text-align: center; font-size: 20px; color: #1f497d; margin-bottom: 5px; }
+        p.subtitle { text-align: center; font-size: 13px; color: #666; margin-bottom: 20px; }
+        .filter-btn-group { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        .filter-btn { padding: 8px 16px; border: none; background: #e0e0e0; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        .filter-btn.active { background: #00c300; color: white; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; max-width: 1000px; margin: 0 auto; }
+        .card { background: white; border-radius: 12px; padding: 12px 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .card-info { display: flex; flex-direction: column; }
+        .region-tag { font-size: 11px; font-weight: bold; color: #888; text-transform: uppercase; }
+        .store-name { font-size: 15px; font-weight: bold; margin: 2px 0; color: #222; }
+        .line-id { font-size: 12px; color: #666; }
+        .add-btn { background-color: #00c300; color: white; text-decoration: none; font-weight: bold; padding: 8px 14px; border-radius: 8px; font-size: 13px; white-space: nowrap; transition: background 0.2s; }
+        .add-btn.clicked { background-color: #a0a0a0 !important; }
+        .badge { background: #ff4d4f; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: 4px; }
+    </style>
+</head>
+<body>
+    <h1>LINE 門市帳號一鍵快速加好友</h1>
+    <p class="subtitle">點擊右側按鈕會直接開啟 LINE App 彈出加好友視窗（已點過的按鈕會自動變成灰色標記）</p>
+
+    <div class="filter-btn-group">
+        <button class="filter-btn active" onclick="filterRegion('all', this)">全部 (57)</button>
+        <button class="filter-btn" onclick="filterRegion('北部', this)">北部 (16)</button>
+        <button class="filter-btn" onclick="filterRegion('中部', this)">中部 (18)</button>
+        <button class="filter-btn" onclick="filterRegion('南部', this)">南部 (21)</button>
+        <button class="filter-btn" onclick="filterRegion('東部', this)">東部 (2)</button>
+    </div>
+
+    <div class="grid" id="storeGrid">
+        <!-- 門市資料由內部邏輯渲染 -->
+    </div>
+
+    <script>
+        function filterRegion(region, btnElement) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                if (region === 'all' || card.getAttribute('data-region') === region) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function markVisited(id) {
+            const btn = document.getElementById('btn-' + id);
+            if (btn) {
+                btn.classList.add('clicked');
+                let visited = JSON.parse(localStorage.getItem('visited_lines') || '[]');
+                if (!visited.includes(id)) {
+                    visited.push(id);
+                    localStorage.setItem('visited_lines', JSON.stringify(visited));
+                }
+            }
+        }
+
+        window.onload = function() {
+            let visited = JSON.parse(localStorage.getItem('visited_lines') || '[]');
+            visited.forEach(id => {
+                const btn = document.getElementById('btn-' + id);
+                if (btn) btn.classList.add('clicked');
+            });
+        };
+    </script>
+</body>
+</html>
