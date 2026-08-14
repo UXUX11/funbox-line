@@ -38,9 +38,14 @@
             color: white !important;
         }
 
+
+        #backToTop { position:fixed; right:max(12px, calc((100vw - 1040px) / 2)); bottom:20px; z-index:9999; border:0; border-radius:999px; background:#1f497d; color:#fff; padding:10px 14px; font-size:13px; font-weight:bold; box-shadow:0 3px 10px rgba(0,0,0,.18); cursor:pointer; display:none; }
+        #backToTop:active { transform:scale(.96); }
+        @media (max-width:600px) { #backToTop { left:12px; right:auto; bottom:14px; padding:9px 12px; font-size:12px; } }
     </style>
 </head>
 <body>
+<button id="backToTop" type="button" onclick="scrollToTop()">↑ 回到最上面</button>
 <div class="page-tabs">
 <button class="page-tab active" onclick="showPage('draws', this)">陀螺抽選（77）</button>
 <button class="page-tab" onclick="showPage('stores', this)" style="display:none !important;">LINE 門市</button>
@@ -253,7 +258,25 @@
                 const city = group.getAttribute('data-draw-city-group');
                 group.style.display = (region === 'all' || city === region) ? '' : 'none';
             });
+
+            // 選擇縣市後，右下角立即顯示「回到最上面」；全部時則依捲動位置決定
+            const topBtn = document.getElementById('backToTop');
+            if (topBtn) {
+                topBtn.style.display = (region !== 'all' || window.scrollY > 120) ? 'block' : 'none';
+            }
         }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateBackToTop() {
+            const btn = document.getElementById('backToTop');
+            const drawsVisible = document.getElementById('page-draws')?.style.display !== 'none';
+            btn.style.display = (drawsVisible && window.scrollY > 120) ? 'block' : 'none';
+        }
+
+        window.addEventListener('scroll', updateBackToTop, { passive: true });
 
         function filterRegion(region, btnElement) {
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
