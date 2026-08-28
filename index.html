@@ -163,7 +163,16 @@
                 filter.style.display = 'none';
                 storeGrid.style.display = 'none';
                 draws.style.display = 'block';
-                filterDrawRegion('all', document.querySelector('#page-draws .draw-filter-btn-group .filter-btn'));
+
+                const savedRegion = localStorage.getItem('selected_draw_region') || 'all';
+                const savedButton = Array.from(
+                    document.querySelectorAll('#page-draws .draw-filter-btn-group .filter-btn')
+                ).find(btn => {
+                    const onclick = btn.getAttribute('onclick') || '';
+                    return onclick.includes(`'${savedRegion}'`);
+                }) || document.querySelector('#page-draws .draw-filter-btn-group .filter-btn');
+
+                filterDrawRegion(savedRegion, savedButton);
             } else {
                 storesTitle.style.display = '';
                 storesSubtitle.style.display = '';
@@ -197,6 +206,8 @@
             document.querySelectorAll('#page-draws .draw-filter-btn-group .filter-btn')
                 .forEach(btn => btn.classList.remove('active'));
             if (btnElement) btnElement.classList.add('active');
+
+            localStorage.setItem('selected_draw_region', region);
 
             document.querySelectorAll('#page-draws .draw-city-group').forEach(group => {
                 const city = group.getAttribute('data-draw-city-group');
