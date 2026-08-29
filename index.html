@@ -344,6 +344,11 @@
                 const city = group.getAttribute('data-draw-city-group');
                 group.style.display = (region === 'all' || city === region) ? '' : 'none';
             });
+
+            // 記住上次選擇的縣市，重新整理後維持原本位置。
+            try {
+                localStorage.setItem('funbox_selected_draw_region', region);
+            } catch (e) {}
         }
 
         function filterRegion(region, btnElement) {
@@ -374,6 +379,28 @@
 
         window.onload = function() {
             showPage('draws', document.querySelectorAll('.page-tab')[0]);
+
+            // 重新整理後恢復上次選擇的縣市，而不是每次都回到「全部」。
+            let savedRegion = 'all';
+            try {
+                savedRegion = localStorage.getItem('funbox_selected_draw_region') || 'all';
+            } catch (e) {}
+
+            const drawButtons = document.querySelectorAll('#page-draws .draw-filter-btn-group .filter-btn');
+            let savedButton = null;
+            drawButtons.forEach(btn => {
+                const match = btn.getAttribute('onclick') || '';
+                if (match.includes("'" + savedRegion + "'")) {
+                    savedButton = btn;
+                }
+            });
+
+            if (!savedButton) {
+                savedRegion = 'all';
+                savedButton = document.querySelector('#page-draws .draw-filter-btn-group .filter-btn');
+            }
+            filterDrawRegion(savedRegion, savedButton);
+
             let visited = JSON.parse(localStorage.getItem('visited_lines') || '[]');
             visited.forEach(id => {
                 const btn = document.getElementById('btn-' + id);
