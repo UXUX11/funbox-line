@@ -218,6 +218,37 @@
 @media (max-width:700px){
   #missing-store-panel{margin-bottom:10px}
 }
+</style><style>
+#missing-stores-notice{
+  width:fit-content;
+  max-width:100%;
+  margin:0 0 12px auto;
+  padding:10px 14px;
+  border:1px solid #d9d9d9;
+  border-radius:10px;
+  background:#fff;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+  text-align:left;
+}
+#missing-stores-notice .missing-stores-title{
+  font-weight:700;
+  margin-bottom:6px;
+}
+#missing-stores-notice ul{
+  margin:0;
+  padding-left:20px;
+}
+#missing-stores-notice li{
+  margin:3px 0;
+  line-height:1.35;
+}
+@media (max-width:700px){
+  #missing-stores-notice{
+    width:100%;
+    margin:0 0 10px 0;
+    box-sizing:border-box;
+  }
+}
 </style></head>
 <body>
 <h1 id="stores-title" style="display:none;; display:none !important">LINE 門市帳號一鍵快速加好友</h1>
@@ -311,7 +342,7 @@
     2. 按「開啟抽選」，先抽第一個<br/>
     3. 抽完之後，只要一直按「完成並開啟下一個」，就可以一直抽下去
 </div>
-<div class="draw-filter-btn-group"><button class="filter-btn active" onclick="filterDrawRegion('all', this)">全部 (73)</button><button class="filter-btn" onclick="filterDrawRegion('台北市', this)">台北市 (11)</button><button class="filter-btn" onclick="filterDrawRegion('新北市', this)">新北市 (8)</button><button class="filter-btn" onclick="filterDrawRegion('桃園市', this)">桃園市 (7)</button><button class="filter-btn" onclick="filterDrawRegion('新竹市', this)">新竹市 (3)</button><button class="filter-btn" onclick="filterDrawRegion('新竹縣', this)">新竹縣 (1)</button><button class="filter-btn" onclick="filterDrawRegion('苗栗縣', this)">苗栗縣 (1)</button><button class="filter-btn" onclick="filterDrawRegion('台中市', this)">台中市 (10)</button><button class="filter-btn" onclick="filterDrawRegion('彰化縣', this)">彰化縣 (2)</button><button class="filter-btn" onclick="filterDrawRegion('雲林縣', this)">雲林縣 (1)</button><button class="filter-btn" onclick="filterDrawRegion('嘉義市', this)">嘉義市 (3)</button><button class="filter-btn" onclick="filterDrawRegion('台南市', this)">台南市 (5)</button><button class="filter-btn" onclick="filterDrawRegion('高雄市', this)">高雄市 (14)</button><button class="filter-btn" onclick="filterDrawRegion('屏東縣', this)">屏東縣 (3)</button><button class="filter-btn" onclick="filterDrawRegion('宜蘭縣', this)">宜蘭縣 (1)</button><button class="filter-btn" onclick="filterDrawRegion('台東縣', this)">台東縣 (2)</button><button class="filter-btn" onclick="filterDrawRegion('澎湖縣', this)">澎湖縣 (1)</button></div>
+<div id="missing-stores-notice"><div class="missing-stores-title">目前缺少</div><ul><li>Funbox Toys-大葉高島屋</li><li>funbox 享平方店</li><li>Funbox 宏匯廣場店（施工中）</li><li>funbox 花蓮店（沒進陀螺）</li></ul></div><div class="draw-filter-btn-group"><button class="filter-btn active" onclick="filterDrawRegion('all', this)">全部 (73)</button><button class="filter-btn" onclick="filterDrawRegion('台北市', this)">台北市 (11)</button><button class="filter-btn" onclick="filterDrawRegion('新北市', this)">新北市 (8)</button><button class="filter-btn" onclick="filterDrawRegion('桃園市', this)">桃園市 (7)</button><button class="filter-btn" onclick="filterDrawRegion('新竹市', this)">新竹市 (3)</button><button class="filter-btn" onclick="filterDrawRegion('新竹縣', this)">新竹縣 (1)</button><button class="filter-btn" onclick="filterDrawRegion('苗栗縣', this)">苗栗縣 (1)</button><button class="filter-btn" onclick="filterDrawRegion('台中市', this)">台中市 (10)</button><button class="filter-btn" onclick="filterDrawRegion('彰化縣', this)">彰化縣 (2)</button><button class="filter-btn" onclick="filterDrawRegion('雲林縣', this)">雲林縣 (1)</button><button class="filter-btn" onclick="filterDrawRegion('嘉義市', this)">嘉義市 (3)</button><button class="filter-btn" onclick="filterDrawRegion('台南市', this)">台南市 (5)</button><button class="filter-btn" onclick="filterDrawRegion('高雄市', this)">高雄市 (14)</button><button class="filter-btn" onclick="filterDrawRegion('屏東縣', this)">屏東縣 (3)</button><button class="filter-btn" onclick="filterDrawRegion('宜蘭縣', this)">宜蘭縣 (1)</button><button class="filter-btn" onclick="filterDrawRegion('台東縣', this)">台東縣 (2)</button><button class="filter-btn" onclick="filterDrawRegion('澎湖縣', this)">澎湖縣 (1)</button></div>
 <div class="continuous-draw-panel" id="continuousDrawPanel">
 <div class="continuous-draw-title">📱 連續抽選模式</div>
 <div class="continuous-draw-progress" id="continuousDrawProgress">載入中...</div>
