@@ -183,6 +183,32 @@
     color:#222;
 }
 
+
+.draw-title-wrap {
+    position: relative;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+.draw-last-updated {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: #888;
+    white-space: nowrap;
+}
+@media (max-width: 600px) {
+    .draw-title-wrap {
+        padding-top: 18px;
+    }
+    .draw-last-updated {
+        top: 3px;
+        right: 8px;
+        transform: none;
+        font-size: 11px;
+    }
+}
 </style>
 <style>
 #missing-store-panel{
@@ -375,7 +401,7 @@
 <div class="card" data-region="台東縣"><div class="card-info"><div class="store-name">台東家樂福</div><span class="line-id">@438glrqv</span></div><a class="add-btn" href="https://line.me/ti/p/~@438glrqv" id="btn-438glrqv" onclick="markVisited('438glrqv')" rel="noopener" target="_blank">＋ 加好友</a></div>
 <div class="card" data-region="台東縣"><div class="card-info"><div class="store-name">台東秀泰</div><span class="line-id">@438glrqv</span></div><div class="card-actions"><a class="add-friend-btn" href="https://line.me/R/ti/p/@438glrqv" rel="noopener" target="_blank">＋ 加好友</a></div></div></div>
 <div id="page-draws" style="display:block;">
-<h1 class="draw-main-title">9/11 9/12抽陀螺</h1>
+<div class="draw-title-wrap"><h1 class="draw-main-title">9/11 9/12抽陀螺</h1><div class="draw-last-updated">最後更新：2026/09/10 19:55</div></div>
 <div class="continuous-draw-guide">
 <strong>連續抽選模式操作方式</strong><br/>
     1. 先選縣市，也可以再用「商品篩選」選型號<br/>
