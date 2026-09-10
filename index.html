@@ -279,6 +279,75 @@
         flex: 1;
     }
 }
+
+.draw-top-notice {
+    position: absolute;
+    right: 8px;
+    top: calc(50% + 20px);
+    transform: translateY(-50%);
+    text-align: right;
+    font-size: 12px;
+    line-height: 1.55;
+    color: #666;
+    white-space: nowrap;
+}
+.draw-top-notice strong {
+    color: #a33;
+}
+@media (max-width: 600px) {
+    .draw-title-wrap {
+        padding-top: 56px;
+    }
+    .draw-last-updated {
+        top: 3px;
+        right: 8px;
+        transform: none;
+    }
+    .draw-top-notice {
+        top: 22px;
+        right: 8px;
+        transform: none;
+        font-size: 11px;
+    }
+}
+
+/* 右側「目前缺少」提醒卡 */
+.draw-missing-box {
+    width: 275px;
+    max-width: calc(100% - 24px);
+    margin: 10px 0 10px auto;
+    padding: 12px 14px;
+    background: #fff;
+    border: 1px solid #d8d8d8;
+    border-radius: 10px;
+    box-shadow: 0 2px 7px rgba(0,0,0,.10);
+    box-sizing: border-box;
+    color: #222;
+}
+.draw-missing-title {
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+.draw-missing-box ul {
+    margin: 0;
+    padding-left: 20px;
+}
+.draw-missing-box li {
+    margin: 4px 0;
+    line-height: 1.45;
+}
+@media (max-width: 600px) {
+    .draw-missing-box {
+        width: 100%;
+        margin: 10px 0 12px;
+    }
+}
+
+@media (max-width: 600px) {
+    .draw-title-wrap {
+        padding-top: 18px;
+    }
+}
 </style>
 <style>
 #missing-store-panel{
@@ -471,14 +540,14 @@
 <div class="card" data-region="台東縣"><div class="card-info"><div class="store-name">台東家樂福</div><span class="line-id">@438glrqv</span></div><a class="add-btn" href="https://line.me/ti/p/~@438glrqv" id="btn-438glrqv" onclick="markVisited('438glrqv')" rel="noopener" target="_blank">＋ 加好友</a></div>
 <div class="card" data-region="台東縣"><div class="card-info"><div class="store-name">台東秀泰</div><span class="line-id">@438glrqv</span></div><div class="card-actions"><a class="add-friend-btn" href="https://line.me/R/ti/p/@438glrqv" rel="noopener" target="_blank">＋ 加好友</a></div></div></div>
 <div id="page-draws" style="display:block;">
-<div class="draw-title-wrap"><h1 class="draw-main-title">9/11 9/12抽陀螺</h1><div class="draw-last-updated">最後更新：2026/09/10 22:13</div></div>
+<div class="draw-title-wrap"><h1 class="draw-main-title">9/11 9/12抽陀螺</h1><div class="draw-last-updated">最後更新：2026/09/10 22:23</div></div>
 <div class="continuous-draw-guide">
 <strong>連續抽選模式操作方式</strong><br/>
     1. 先選縣市，也可以再用「商品篩選」選型號<br/>
     2. 快速抽會只抓目前篩選後看得到的商品<br/>
     3. 按「開啟抽選」後，再一直按「完成並開啟下一個」即可
 </div>
-<div class="draw-filter-btn-group"><button class="filter-btn active" onclick="filterDrawRegion('all', this)">全部 (38)</button><button class="filter-btn" onclick="filterDrawRegion('台北市', this)">台北市 (9)</button><button class="filter-btn" onclick="filterDrawRegion('新北市', this)">新北市 (5)</button><button class="filter-btn" onclick="filterDrawRegion('桃園市', this)">桃園市 (1)</button><button class="filter-btn" onclick="filterDrawRegion('新竹市', this)">新竹市 (2)</button><button class="filter-btn" onclick="filterDrawRegion('新竹縣', this)">新竹縣 (1)</button><button class="filter-btn" onclick="filterDrawRegion('台中市', this)">台中市 (4)</button><button class="filter-btn" onclick="filterDrawRegion('彰化縣', this)">彰化縣 (2)</button><button class="filter-btn" onclick="filterDrawRegion('雲林縣', this)">雲林縣 (1)</button><button class="filter-btn" onclick="filterDrawRegion('嘉義市', this)">嘉義市 (2)</button><button class="filter-btn" onclick="filterDrawRegion('高雄市', this)">高雄市 (7)</button><button class="filter-btn" onclick="filterDrawRegion('屏東縣', this)">屏東縣 (2)</button><button class="filter-btn" onclick="filterDrawRegion('宜蘭縣', this)">宜蘭縣 (1)</button><button class="filter-btn" onclick="filterDrawRegion('澎湖縣', this)">澎湖縣 (1)</button></div><div class="draw-secondary-filters"><div class="product-filter-wrap"><label class="product-filter-label" for="drawProductFilter">商品篩選：</label><select class="product-filter-select" id="drawProductFilter" onchange="filterDrawProduct(this.value)"><option value="all">全部商品</option><option value="BX-00">BX-00</option><option value="BX-10">BX-10</option><option value="BX-18">BX-18</option><option value="BX-25">BX-25</option><option value="BX-26">BX-26</option><option value="BX-30">BX-30</option><option value="BX-33">BX-33</option><option value="BX-37">BX-37</option><option value="BX-45">BX-45</option><option value="BX-50">BX-50</option><option value="BX-57">BX-57</option><option value="UX-00">UX-00</option><option value="UX-02">UX-02</option><option value="UX-19">UX-19</option><option value="UX-20">UX-20</option><option value="UX-21">UX-21</option><option value="CX-00">CX-00</option><option value="CX-12">CX-12</option><option value="CX-13">CX-13</option><option value="CX-18">CX-18</option><option value="BXG-01">BXG-01</option><option value="BXG-04">BXG-04</option></select></div><div class="time-filter-wrap"><div class="product-filter-label">時間篩選：</div><div class="time-filter-btn-group"><button class="filter-btn time-filter-btn active" data-time-filter="all" onclick="filterDrawTime('all', this)">全部時間</button><button class="filter-btn time-filter-btn" data-time-filter="10:00" onclick="filterDrawTime('10:00', this)">10:00</button><button class="filter-btn time-filter-btn" data-time-filter="10:30" onclick="filterDrawTime('10:30', this)">10:30</button><button class="filter-btn time-filter-btn" data-time-filter="11:00" onclick="filterDrawTime('11:00', this)">11:00</button><button class="filter-btn time-filter-btn" data-time-filter="12:00" onclick="filterDrawTime('12:00', this)">12:00</button></div></div></div>
+<div class="draw-missing-box"><div class="draw-missing-title">目前缺少</div><ul><li>Funbox Toys-大葉高島屋（施工中）</li><li>Funbox 宏匯廣場店（施工中）</li><li>Funbox 花蓮遠東店（沒有進貨）</li></ul></div><div class="draw-filter-btn-group"><button class="filter-btn active" onclick="filterDrawRegion('all', this)">全部 (38)</button><button class="filter-btn" onclick="filterDrawRegion('台北市', this)">台北市 (9)</button><button class="filter-btn" onclick="filterDrawRegion('新北市', this)">新北市 (5)</button><button class="filter-btn" onclick="filterDrawRegion('桃園市', this)">桃園市 (1)</button><button class="filter-btn" onclick="filterDrawRegion('新竹市', this)">新竹市 (2)</button><button class="filter-btn" onclick="filterDrawRegion('新竹縣', this)">新竹縣 (1)</button><button class="filter-btn" onclick="filterDrawRegion('台中市', this)">台中市 (4)</button><button class="filter-btn" onclick="filterDrawRegion('彰化縣', this)">彰化縣 (2)</button><button class="filter-btn" onclick="filterDrawRegion('雲林縣', this)">雲林縣 (1)</button><button class="filter-btn" onclick="filterDrawRegion('嘉義市', this)">嘉義市 (2)</button><button class="filter-btn" onclick="filterDrawRegion('高雄市', this)">高雄市 (7)</button><button class="filter-btn" onclick="filterDrawRegion('屏東縣', this)">屏東縣 (2)</button><button class="filter-btn" onclick="filterDrawRegion('宜蘭縣', this)">宜蘭縣 (1)</button><button class="filter-btn" onclick="filterDrawRegion('澎湖縣', this)">澎湖縣 (1)</button></div><div class="draw-secondary-filters"><div class="product-filter-wrap"><label class="product-filter-label" for="drawProductFilter">商品篩選：</label><select class="product-filter-select" id="drawProductFilter" onchange="filterDrawProduct(this.value)"><option value="all">全部商品</option><option value="BX-00">BX-00</option><option value="BX-10">BX-10</option><option value="BX-18">BX-18</option><option value="BX-25">BX-25</option><option value="BX-26">BX-26</option><option value="BX-30">BX-30</option><option value="BX-33">BX-33</option><option value="BX-37">BX-37</option><option value="BX-45">BX-45</option><option value="BX-50">BX-50</option><option value="BX-57">BX-57</option><option value="UX-00">UX-00</option><option value="UX-02">UX-02</option><option value="UX-19">UX-19</option><option value="UX-20">UX-20</option><option value="UX-21">UX-21</option><option value="CX-00">CX-00</option><option value="CX-12">CX-12</option><option value="CX-13">CX-13</option><option value="CX-18">CX-18</option><option value="BXG-01">BXG-01</option><option value="BXG-04">BXG-04</option></select></div><div class="time-filter-wrap"><div class="product-filter-label">時間篩選：</div><div class="time-filter-btn-group"><button class="filter-btn time-filter-btn active" data-time-filter="all" onclick="filterDrawTime('all', this)">全部時間</button><button class="filter-btn time-filter-btn" data-time-filter="10:00" onclick="filterDrawTime('10:00', this)">10:00</button><button class="filter-btn time-filter-btn" data-time-filter="10:30" onclick="filterDrawTime('10:30', this)">10:30</button><button class="filter-btn time-filter-btn" data-time-filter="11:00" onclick="filterDrawTime('11:00', this)">11:00</button><button class="filter-btn time-filter-btn" data-time-filter="12:00" onclick="filterDrawTime('12:00', this)">12:00</button></div></div></div>
 <div class="continuous-draw-panel" id="continuousDrawPanel">
 <div class="continuous-draw-title">📱 連續抽選模式</div>
 <div class="continuous-draw-progress" id="continuousDrawProgress">載入中...</div>
