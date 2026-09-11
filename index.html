@@ -454,6 +454,39 @@
 #page-draws .draw-item-clickable:has(.draw-link.clicked) {
     background:#f2f2f2 !important;
 }
+</style><style>
+/* Mobile alignment fix for top-right "目前缺少" box */
+.draw-missing-box {
+    box-sizing: border-box;
+}
+.draw-missing-box > div:not(.draw-missing-title) {
+    display: block;
+    text-align: left;
+    line-height: 1.55;
+    margin: 4px 0;
+    padding: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+.draw-missing-title {
+    text-align: left;
+}
+@media (max-width: 768px) {
+    .draw-missing-box {
+        width: 100%;
+        max-width: 100%;
+        text-align: left;
+    }
+    .draw-missing-box > div,
+    .draw-missing-box > div:not(.draw-missing-title) {
+        width: 100%;
+        box-sizing: border-box;
+        text-align: left;
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
 </style></head>
 <body>
 <h1 id="stores-title" style="display:none;; display:none !important">LINE 門市帳號一鍵快速加好友</h1>
@@ -566,7 +599,7 @@
   cursor: not-allowed;
 }
 </style>
-<div class="draw-title-wrap"><h1 class="draw-main-title">9/11 9/12抽陀螺</h1><div class="draw-last-updated">最後更新：2026/09/11 11:24</div></div>
+<div class="draw-title-wrap"><h1 class="draw-main-title">9/11 9/12抽陀螺</h1><div class="draw-last-updated">最後更新：2026/09/11 11:33</div></div>
 <div class="continuous-draw-guide">
 <strong>連續抽選模式操作方式</strong><br/>
     1. 先選縣市，也可以再用「商品篩選」選型號<br/>
