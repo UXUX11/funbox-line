@@ -599,7 +599,7 @@
   cursor: not-allowed;
 }
 </style>
-<div class="draw-title-wrap"><h1 class="draw-main-title">9/11 9/12抽陀螺</h1><div class="draw-last-updated">最後更新：2026/09/11 11:40</div></div>
+<div class="draw-title-wrap"><h1 class="draw-main-title">9/11 9/12抽陀螺</h1><div class="draw-last-updated">最後更新：2026/09/11 11:43</div></div>
 <div class="continuous-draw-guide">
 <strong>連續抽選模式操作方式</strong><br/>
     1. 先選縣市，也可以再用「商品篩選」選型號<br/>
@@ -717,6 +717,8 @@
                 );
             } catch (e) {}
         }
+
+        window.restoreDrawVisited = restoreDrawVisited;
 
         function filterDrawRegion(region, btnElement) {
             document.querySelectorAll('#page-draws .draw-filter-btn-group .filter-btn')
@@ -902,7 +904,25 @@
         if (product.link) {
             product.link.classList.add("clicked");
         }
-        product.element.classList.add("quick-drawn");
+        if (product.element) {
+            product.element.classList.add("quick-drawn");
+
+            // 快速抽與下方清單共用同一份「已抽過」紀錄。
+            // 同時寫入 row id，避免其他同步/篩選流程把灰色狀態洗掉。
+            var rowId = product.element.getAttribute("data-draw-id");
+            if (rowId) {
+                var visited = [];
+                try {
+                    visited = JSON.parse(localStorage.getItem("visited_draw_links") || "[]");
+                } catch (e) {}
+                if (!visited.includes(rowId)) {
+                    visited.push(rowId);
+                    try {
+                        localStorage.setItem("visited_draw_links", JSON.stringify(visited));
+                    } catch (e) {}
+                }
+            }
+        }
     }
 
     function isDrawn(product) {
@@ -1176,6 +1196,12 @@ function render() {
         }
 
         markDrawn(currentItem.product);
+        syncDrawnRows();
+
+        // 立即同步下方清單的灰色狀態，不必等重新整理。
+        if (typeof window.restoreDrawVisited === "function") {
+            window.restoreDrawVisited();
+        }
 
         var nextItem = findNextItem();
         currentItem = nextItem;
