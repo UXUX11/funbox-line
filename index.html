@@ -566,7 +566,7 @@
   cursor: not-allowed;
 }
 </style>
-<div class="draw-title-wrap"><h1 class="draw-main-title">9/11 9/12抽陀螺</h1><div class="draw-last-updated">最後更新：2026/09/11 11:06</div></div>
+<div class="draw-title-wrap"><h1 class="draw-main-title">9/11 9/12抽陀螺</h1><div class="draw-last-updated">最後更新：2026/09/11 11:08</div></div>
 <div class="continuous-draw-guide">
 <strong>連續抽選模式操作方式</strong><br/>
     1. 先選縣市，也可以再用「商品篩選」選型號<br/>
@@ -773,20 +773,22 @@
 
         document.querySelectorAll("#page-draws .draw-item").forEach(function (itemEl) {
             var linkEl = itemEl.querySelector(".draw-link");
-            if (!linkEl) return;
-
-            var href = linkEl.href || "";
+            var href = (itemEl.getAttribute("data-draw-href") || (linkEl && linkEl.href) || "");
             if (!href) return;
 
-            // 舊版按鈕已經是灰色，或保留了 clicked 狀態，就視為以前抽過。
-            var computed = window.getComputedStyle(linkEl);
-            var bg = (computed.backgroundColor || "").replace(/\s/g, "");
-            var isLegacyGray =
-                linkEl.classList.contains("clicked") ||
-                linkEl.classList.contains("quick-drawn") ||
-                bg === "rgb(160,160,160)" ||
-                bg === "rgb(169,169,169)" ||
-                bg === "rgb(217,217,217)";
+            var isLegacyGray = itemEl.classList.contains("quick-drawn");
+
+            if (linkEl) {
+                var computed = window.getComputedStyle(linkEl);
+                var bg = (computed.backgroundColor || "").replace(/\s/g, "");
+                isLegacyGray =
+                    isLegacyGray ||
+                    linkEl.classList.contains("clicked") ||
+                    linkEl.classList.contains("quick-drawn") ||
+                    bg === "rgb(160,160,160)" ||
+                    bg === "rgb(169,169,169)" ||
+                    bg === "rgb(217,217,217)";
+            }
 
             if (isLegacyGray && !map[href]) {
                 map[href] = true;
@@ -821,14 +823,14 @@
 
             storeEl.querySelectorAll(".draw-item").forEach(function (itemEl) {
                 var productEl = itemEl.querySelector(".draw-product");
-                var linkEl = itemEl.querySelector(".draw-link");
-                if (!productEl || !linkEl || !linkEl.href) return;
+                var href = itemEl.getAttribute("data-draw-href") || "";
+                if (!productEl || !href) return;
 
                 products.push({
                     product: productEl.textContent.trim(),
-                    url: linkEl.href,
+                    url: href,
                     element: itemEl,
-                    link: linkEl
+                    link: null
                 });
             });
 
@@ -887,9 +889,10 @@
             store.products.forEach(function (product) {
                 if (map[product.url]) {
                     product.element.classList.add("quick-drawn");
-                    product.link.classList.add("clicked");
+                    if (product.link) product.link.classList.add("clicked");
                 } else {
                     product.element.classList.remove("quick-drawn");
+                    if (product.link) product.link.classList.remove("clicked");
                 }
             });
         });
