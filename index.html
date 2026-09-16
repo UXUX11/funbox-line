@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>9/18 9/19 抽選</title>
+<title>Funbox / 來玩聚 LINE 官方帳號一鍵抽獎</title>
 <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 15px; color: #333; }
         h1 { text-align: center; font-size: 20px; color: #1f497d; margin-bottom: 5px; }
@@ -604,6 +604,49 @@
     .draw-mode-panel { margin-left: 2px; margin-right: 2px; }
     .draw-mode-btn { font-size: 13px; padding: 10px 7px; }
 }
+</style><style>
+/* 讓時間篩選按鈕與縣市篩選按鈕視覺一致 */
+#page-draws .time-filter-btn{
+    appearance:none;
+    -webkit-appearance:none;
+    border:none;
+    border-radius:999px;
+    background:#e6e6e6;
+    color:#1687e8;
+    font-weight:700;
+    font-size:16px;
+    line-height:1;
+    padding:12px 22px;
+    min-width:auto;
+    height:auto;
+    cursor:pointer;
+    box-sizing:border-box;
+    box-shadow:none;
+    transition:background .15s ease, color .15s ease, transform .05s ease;
+}
+#page-draws .time-filter-btn:hover{
+    filter:brightness(.98);
+}
+#page-draws .time-filter-btn:active{
+    transform:scale(.98);
+}
+#page-draws .time-filter-btn.active{
+    background:#00c600;
+    color:#fff;
+}
+#page-draws .time-filter-btn-group,
+#page-draws .draw-time-filter-btn-group{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+}
+@media (max-width:768px){
+    #page-draws .time-filter-btn{
+        font-size:15px;
+        padding:11px 18px;
+    }
+}
 </style></head>
 <body>
 <h1 id="stores-title" style="display:none;; display:none !important">LINE 門市帳號一鍵快速加好友</h1>
@@ -716,7 +759,7 @@
   cursor: not-allowed;
 }
 </style>
-<div class="draw-title-wrap"><h1 class="draw-main-title">9/18 9/19 抽選</h1><div class="draw-last-updated">最後更新：2026/09/16 15:34</div></div>
+<div class="draw-title-wrap"><h1 class="draw-main-title">9/18 9/19 抽選</h1><div class="draw-last-updated">最後更新：2026/09/16 15:51</div></div>
 <div class="draw-mode-panel" id="drawModePanel">
 <div class="draw-mode-title">抽選模式</div>
 <div class="draw-mode-buttons">
@@ -725,23 +768,8 @@
 </div>
 <div class="draw-mode-desc" id="drawModeDesc">手動模式：點哪一筆就只開哪一筆，不會自動跳下一個。</div>
 </div>
-<div class="draw-filter-btn-group">
-<button class="filter-btn active" onclick="filterDrawRegion('all', this)">全部 (1)</button>
-<button class="filter-btn" onclick="filterDrawRegion('台中市', this)">台中市 (1)</button>
-</div><div class="draw-secondary-filters"><div class="product-filter-wrap"><label class="product-filter-label" for="drawProductFilter">商品篩選：</label><select class="product-filter-select" id="drawProductFilter" onchange="filterDrawProduct(this.value)"><option value="all">全部商品</option><option value="UX-03">UX-03</option><option value="CX-00">CX-00</option><option value="BX-00">BX-00</option></select></div><div class="time-filter-wrap"><div class="product-filter-label">時間篩選：</div><div class="time-filter-btn-group">
-<button class="filter-btn time-filter-btn active" data-time-filter="all" onclick="filterDrawTime('all', this)">全部時間</button>
-<button class="filter-btn time-filter-btn" data-time-filter="11:00" onclick="filterDrawTime('11:00', this)">11:00</button>
-</div></div></div>
-<div class="draw-list">
-<div class="draw-city-group" data-draw-city-group="台中市">
-<div class="draw-city" data-draw-city-heading="台中市">台中市</div>
-<div class="draw-store" data-draw-city="台中市" data-draw-start-time="11:00">
-<div class="draw-store-name">Funbox 台中港三井店</div>
-<div class="draw-start">抽選時間：2026/09/18 11:00~2026/09/19 20:30</div>
-<div class="draw-items"><div class="draw-item draw-item-clickable" data-draw-href="https://lin.ee/rByGY8J" data-draw-id="draw-9a348ac7e968" onclick="openDrawRow(event, this)" onkeydown="handleDrawRowKey(event, this)" role="link" tabindex="0"><div class="draw-product">UX-03 魔導神杖</div></div><div class="draw-item draw-item-clickable" data-draw-href="https://lin.ee/xP6lKDL" data-draw-id="draw-45ba295c73f9" onclick="openDrawRow(event, this)" onkeydown="handleDrawRowKey(event, this)" role="link" tabindex="0"><div class="draw-product">CX-00 迪卡狂怒 FT3-60T</div></div><div class="draw-item draw-item-clickable" data-draw-href="https://lin.ee/qrtPiVM" data-draw-id="draw-56db36a387bd" onclick="openDrawRow(event, this)" onkeydown="handleDrawRowKey(event, this)" role="link" tabindex="0"><div class="draw-product">CX-00 新世紀福音戰士改造組</div></div><div class="draw-item draw-item-clickable" data-draw-href="https://lin.ee/72ErrCn" data-draw-id="draw-82677326a55c" onclick="openDrawRow(event, this)" onkeydown="handleDrawRowKey(event, this)" role="link" tabindex="0"><div class="draw-product">BX-00 蒼龍神劍</div></div></div>
-</div>
-</div>
-</div></div>
+<div class="draw-missing-box" style="display:none;"></div><div class="draw-filter-btn-group"><button class="filter-btn active" onclick="filterDrawRegion('all', this)">全部 (1)</button><button class="filter-btn" onclick="filterDrawRegion('台中市', this)">台中市 (1)</button></div><div class="draw-secondary-filters"><div class="product-filter-wrap"><label class="product-filter-label" for="drawProductFilter">商品篩選：</label><select class="product-filter-select" id="drawProductFilter" onchange="filterDrawProduct(this.value)"><option value="all">全部商品</option><option value="BX-00">BX-00</option><option value="UX-03">UX-03</option><option value="CX-00">CX-00</option></select></div><div class="time-filter-wrap"><div class="product-filter-label">時間篩選：</div><div class="time-filter-btn-group"><button class="time-filter-btn active" data-time-filter="all" onclick="filterDrawTime('all', this)">全部時間</button><button class="time-filter-btn" data-time-filter="11:00" onclick="filterDrawTime('11:00', this)">11:00</button></div></div></div>
+<div class="draw-list"><div class="draw-city-group" data-draw-city-group="台中市"><div class="draw-city" data-draw-city-heading="台中市">台中市</div><div class="draw-store" data-draw-city="台中市" data-draw-start-time="11:00"><div class="draw-store-name">Funbox 台中港三井店</div><div class="draw-start">抽選時間：2026/09/18 11:00~2026/09/19 20:30</div><div class="draw-items"><div class="draw-item draw-item-clickable" data-draw-href="https://lin.ee/72ErrCn" data-draw-id="draw-fa1bb22f729a" onclick="openDrawRow(event, this)" onkeydown="handleDrawRowKey(event, this)" role="link" tabindex="0"><div class="draw-product">BX-00 蒼龍神劍</div></div><div class="draw-item draw-item-clickable" data-draw-href="https://lin.ee/rByGY8J" data-draw-id="draw-b46feacac019" onclick="openDrawRow(event, this)" onkeydown="handleDrawRowKey(event, this)" role="link" tabindex="0"><div class="draw-product">UX-03 魔導神杖</div></div><div class="draw-item draw-item-clickable" data-draw-href="https://lin.ee/qrtPiVM" data-draw-id="draw-221fb76b8605" onclick="openDrawRow(event, this)" onkeydown="handleDrawRowKey(event, this)" role="link" tabindex="0"><div class="draw-product">CX-00 新世紀福音戰士陀螺套組</div></div><div class="draw-item draw-item-clickable" data-draw-href="https://lin.ee/xP6lKDL" data-draw-id="draw-135233b01123" onclick="openDrawRow(event, this)" onkeydown="handleDrawRowKey(event, this)" role="link" tabindex="0"><div class="draw-product">CX-00 迪卡狂怒 FT3-60T</div></div></div></div></div></div></div>
 <script>
 
         function showPage(page, btnElement) {
@@ -781,16 +809,16 @@
             // 記錄 draw id
             let visited = [];
             try {
-                visited = JSON.parse(localStorage.getItem('visited_draw_links') || '[]');
+                visited = JSON.parse(localStorage.getItem('visited_draw_links_0918_0919') || '[]');
             } catch (e) {}
             if (!visited.includes(id)) {
                 visited.push(id);
-                localStorage.setItem('visited_draw_links', JSON.stringify(visited));
+                localStorage.setItem('visited_draw_links_0918_0919', JSON.stringify(visited));
             }
 
             // 與快速抽獎共用網址紀錄
             try {
-                const key = 'funbox_continuous_draw_v9_drawn';
+                const key = 'funbox_continuous_draw_0918_0919_drawn';
                 const map = JSON.parse(localStorage.getItem(key) || '{}');
                 const href = row.getAttribute('data-draw-href');
                 if (href) {
@@ -815,11 +843,11 @@
             let visited = [];
             let drawnMapForQuick = {};
             try {
-                visited = JSON.parse(localStorage.getItem('visited_draw_links') || '[]');
+                visited = JSON.parse(localStorage.getItem('visited_draw_links_0918_0919') || '[]');
             } catch (e) {}
             try {
                 drawnMapForQuick = JSON.parse(
-                    localStorage.getItem('funbox_continuous_draw_v9_drawn') || '{}'
+                    localStorage.getItem('funbox_continuous_draw_0918_0919_drawn') || '{}'
                 );
             } catch (e) {}
 
@@ -836,9 +864,9 @@
             });
 
             try {
-                localStorage.setItem('visited_draw_links', JSON.stringify(visited));
+                localStorage.setItem('visited_draw_links_0918_0919', JSON.stringify(visited));
                 localStorage.setItem(
-                    'funbox_continuous_draw_v9_drawn',
+                    'funbox_continuous_draw_0918_0919_drawn',
                     JSON.stringify(drawnMapForQuick)
                 );
             } catch (e) {}
@@ -925,7 +953,7 @@
 (function () {
     "use strict";
 
-    var DRAWN_KEY = "funbox_continuous_draw_v9_drawn";
+    var DRAWN_KEY = "funbox_continuous_draw_0918_0919_drawn";
     // 將舊版「已變灰／已點過」的抽獎按鈕同步到快速抽選紀錄。
     // 同一個網址下，換 HTML 不會清掉 localStorage；這裡把舊紀錄補進新的 DRAWN_KEY。
     function migrateLegacyDrawnRecords() {
@@ -1173,12 +1201,12 @@
             if (rowId) {
                 var visited = [];
                 try {
-                    visited = JSON.parse(localStorage.getItem("visited_draw_links") || "[]");
+                    visited = JSON.parse(localStorage.getItem("visited_draw_links_0918_0919") || "[]");
                 } catch (e) {}
                 if (!visited.includes(rowId)) {
                     visited.push(rowId);
                     try {
-                        localStorage.setItem("visited_draw_links", JSON.stringify(visited));
+                        localStorage.setItem("visited_draw_links_0918_0919", JSON.stringify(visited));
                     } catch (e) {}
                 }
             }
