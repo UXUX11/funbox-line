@@ -2060,10 +2060,127 @@ function render() {
         return prefix + "-" + m[2];
     }
 
+    function getDrawStores(){
+        return Array.from(document.querySelectorAll("#page-draws .draw-store")).map(function(store){
+            var models = new Set();
+            store.querySelectorAll(".draw-item .draw-product").forEach(function(productEl){
+                var model = normalizeModel(productEl.textContent || "");
+                if (model) models.add(model);
+            });
+            return {
+                el: store,
+                city: store.getAttribute("data-draw-city") || "",
+                time: store.getAttribute("data-draw-start-time") || "",
+                models: models
+            };
+        });
+    }
+
+    function storeMatches(store, region, product, time){
+        if (region && region !== "all" && store.city !== region) return false;
+        if (time && time !== "all" && store.time !== time) return false;
+        if (product && product !== "all" && !store.models.has(product)) return false;
+        return true;
+    }
+
+    function drawRegionFromButton(btn){
+        if (!btn) return "";
+        var click = btn.getAttribute("onclick") || "";
+        var match = click.match(/filterDrawRegion\('([^']+)'/);
+        return match ? match[1] : "";
+    }
+
+    function updateLinkedDrawFilterOptions(stores){
+        var region = window.funboxSelectedDrawRegion || "all";
+        var product = window.funboxSelectedDrawProduct || "all";
+        var time = window.funboxSelectedDrawTime || "all";
+
+        // 縣市：依目前「商品 + 時間」聯動，只保留真的有符合店家的縣市。
+        document.querySelectorAll("#page-draws .draw-filter-btn-group .filter-btn").forEach(function(btn){
+            var candidateRegion = drawRegionFromButton(btn);
+            if (!candidateRegion) return;
+
+            var matchedStores = stores.filter(function(store){
+                return storeMatches(store, candidateRegion, product, time);
+            });
+            var available = candidateRegion === "all" || matchedStores.length > 0;
+            btn.style.display = available ? "" : "none";
+
+            // 數量也跟著目前商品 / 時間更新，避免顯示舊的總店數造成誤會。
+            var labelRegion = candidateRegion === "all" ? "全部" : candidateRegion;
+            btn.textContent = labelRegion + " (" + matchedStores.length + ")";
+        });
+
+        // 商品：依目前「縣市 + 時間」聯動，不存在的型號直接從下拉選單隱藏。
+        var select = document.getElementById("drawProductFilter");
+        if (select) {
+            Array.from(select.options).forEach(function(option){
+                if (option.value === "all") {
+                    option.hidden = false;
+                    option.disabled = false;
+                    return;
+                }
+                var available = stores.some(function(store){
+                    return storeMatches(store, region, option.value, time);
+                });
+                option.hidden = !available;
+                option.disabled = !available;
+                option.style.display = available ? "" : "none";
+            });
+        }
+
+        // 時間：依目前「縣市 + 商品」聯動，沒有符合店家的時間按鈕直接隱藏。
+        document.querySelectorAll("#page-draws .time-filter-btn").forEach(function(btn){
+            var candidateTime = btn.getAttribute("data-time-filter") || "all";
+            if (candidateTime === "all") {
+                btn.style.display = "";
+                return;
+            }
+            var available = stores.some(function(store){
+                return storeMatches(store, region, product, candidateTime);
+            });
+            btn.style.display = available ? "" : "none";
+        });
+    }
+
     window.applyDrawFilters = function(){
         var region = window.funboxSelectedDrawRegion || "all";
         var product = window.funboxSelectedDrawProduct || "all";
         var time = window.funboxSelectedDrawTime || "all";
+        var stores = getDrawStores();
+
+        // 舊版曾允許選出「完全沒有結果」的組合；升級成聯動版後先自動修正，
+        // 避免 localStorage 留著舊條件，造成一進頁面所有選項都消失。
+        if (!stores.some(function(store){ return storeMatches(store, region, product, time); })) {
+            if (region !== "all" && stores.some(function(store){ return storeMatches(store, region, "all", "all"); })) {
+                product = "all";
+                time = "all";
+            } else {
+                region = "all";
+                product = "all";
+                time = "all";
+            }
+
+            window.funboxSelectedDrawRegion = region;
+            window.funboxSelectedDrawProduct = product;
+            window.funboxSelectedDrawTime = time;
+
+            var repairedSelect = document.getElementById("drawProductFilter");
+            if (repairedSelect) repairedSelect.value = product;
+
+            document.querySelectorAll("#page-draws .draw-filter-btn-group .filter-btn").forEach(function(btn){
+                btn.classList.toggle("active", drawRegionFromButton(btn) === region);
+            });
+            document.querySelectorAll("#page-draws .time-filter-btn").forEach(function(btn){
+                btn.classList.toggle("active", (btn.getAttribute("data-time-filter") || "all") === time);
+            });
+
+            try {
+                localStorage.setItem("funbox_selected_draw_region", region);
+                localStorage.setItem("funbox_selected_draw_product", product);
+                localStorage.setItem("funbox_selected_draw_time", time);
+            } catch(e){}
+        }
 
         document.querySelectorAll("#page-draws .draw-city-group").forEach(function(group){
             var city = group.getAttribute("data-draw-city-group") || "";
@@ -2093,6 +2210,8 @@ function render() {
 
             group.style.display = cityAllowed && anyStoreVisible ? "" : "none";
         });
+
+        updateLinkedDrawFilterOptions(stores);
     };
 
     window.filterDrawRegion = function(region, btnElement){
