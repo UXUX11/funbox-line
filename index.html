@@ -1777,7 +1777,7 @@ function render() {
             }
         }
 
-        if (!found || !hasStarted(found.product)) return false;
+        if (!found || !storeHasStarted(found.store) || !hasStarted(found.product)) return false;
 
         clearAutoNextTimers();
         lowerRowSequenceMode = true;
@@ -2327,8 +2327,46 @@ function render() {
 (function(){
     "use strict";
 
+    function rowStoreHasStarted(row) {
+        if (!row) return false;
+        var store = row.closest('.draw-store');
+        if (!store) return true;
+
+        var timeText = String(store.getAttribute('data-draw-start-time') || '').trim();
+        var tm = timeText.match(/^([01]?\d|2[0-3]):([0-5]\d)$/);
+        if (!tm) return true;
+
+        var now = new Date();
+        var year = now.getFullYear();
+        var month = now.getMonth() + 1;
+        var day = now.getDate();
+
+        var startEl = store.querySelector('.draw-start');
+        var startText = startEl ? startEl.textContent : '';
+        var dm = startText.match(/(20\d{2})\s*[\/.-]\s*(\d{1,2})\s*[\/.-]\s*(\d{1,2})/);
+        if (dm) {
+            year = parseInt(dm[1], 10);
+            month = parseInt(dm[2], 10);
+            day = parseInt(dm[3], 10);
+        }
+
+        var start = new Date(
+            year,
+            month - 1,
+            day,
+            parseInt(tm[1], 10),
+            parseInt(tm[2], 10),
+            0,
+            0
+        );
+        return now >= start;
+    }
+
+    window.funboxRowStoreHasStarted = rowStoreHasStarted;
+
     window.openDrawRow = function(event, row) {
     if (!row || row.classList.contains('not-started')) return;
+    if (!rowStoreHasStarted(row)) return;
 
     const href = row.getAttribute('data-draw-href');
     const id = row.getAttribute('data-draw-id');
@@ -2351,6 +2389,28 @@ function render() {
     window.markDrawVisited(id);
     window.location.href = href;
 };
+
+    function syncStoreStartLocks() {
+        document.querySelectorAll('#page-draws .draw-store').forEach(function(store){
+            var sample = store.querySelector('.draw-item');
+            if (!sample) return;
+            var started = rowStoreHasStarted(sample);
+            store.querySelectorAll('.draw-item').forEach(function(row){
+                row.classList.toggle('not-started', !started);
+                if (!started) {
+                    row.setAttribute('aria-disabled', 'true');
+                    row.setAttribute('tabindex', '-1');
+                } else {
+                    row.removeAttribute('aria-disabled');
+                    row.setAttribute('tabindex', '0');
+                }
+            });
+        });
+    }
+
+    syncStoreStartLocks();
+    window.addEventListener('load', syncStoreStartLocks);
+    setInterval(syncStoreStartLocks, 1000);
 
     window.handleDrawRowKey = function(event, row) {
     if (event.key === 'Enter' || event.key === ' ') {
