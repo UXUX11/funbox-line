@@ -33,14 +33,6 @@
         .draw-item { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:7px 0; border-top:1px solid #eee; }
         .draw-product { font-size:14px; }
         .draw-link { background:#00c300; color:white; text-decoration:none; font-weight:bold; padding:6px 12px; border-radius:7px; font-size:12px; white-space:nowrap; }
-        .draw-link.not-started {
-    background-color: #d9d9d9 !important;
-    color: #999 !important;
-    border-color: #d0d0d0 !important;
-    cursor: not-allowed !important;
-    pointer-events: none !important;
-}
-
 .draw-link.clicked {
             background-color: #a0a0a0 !important;
             color: white !important;
@@ -770,11 +762,8 @@
 #page-draws .draw-item.quick-drawn .draw-product {
   color: #666 !important;
 }
-#page-draws .draw-item.not-started {
-  cursor: not-allowed;
-}
 </style>
-<div class="draw-title-wrap"><h1 class="draw-main-title">10/02 10/03 抽選</h1><div class="draw-last-updated">最後更新：2026/10/01 14:45</div></div>
+<div class="draw-title-wrap"><h1 class="draw-main-title">10/02 10/03 抽選</h1><div class="draw-last-updated">最後更新：2026/10/01 15:00</div></div>
 <div class="draw-mode-panel" id="drawModePanel">
 <div class="draw-mode-title">抽選模式</div>
 <div class="draw-mode-buttons">
@@ -1391,48 +1380,12 @@
     // 例如「（8/29 10:00才開始）」：
     // 10:00 前顯示灰色「尚未開始」，10:00 到後自動變成綠色「抽獎」。
     function syncTimedDrawLinks() {
-        var now = new Date();
-
-        document.querySelectorAll("#page-draws .draw-item").forEach(function (itemEl) {
-            var productEl = itemEl.querySelector(".draw-product");
-            var linkEl = itemEl.querySelector(".draw-link");
-            if (!productEl || !linkEl) return;
-
-            var start = getProductStartTime(productEl.textContent.trim());
-
-            if (!start) {
-                linkEl.classList.remove("not-started");
-                if (linkEl.textContent.trim() === "尚未開始") {
-                    linkEl.textContent = "抽獎";
-                }
-                return;
-            }
-
-            // 已抽的狀態不被時間同步覆蓋。
-            if (itemEl.classList.contains("quick-drawn") ||
-                linkEl.classList.contains("clicked")) {
-                linkEl.classList.remove("not-started");
-                return;
-            }
-
-            if (now >= start) {
-                linkEl.classList.remove("not-started");
-                linkEl.textContent = "抽獎";
-                linkEl.removeAttribute("aria-disabled");
-                linkEl.removeAttribute("tabindex");
-                linkEl.title = "";
-            } else {
-                linkEl.classList.add("not-started");
-                linkEl.textContent = "尚未開始";
-                linkEl.setAttribute("aria-disabled", "true");
-                linkEl.setAttribute("tabindex", "-1");
-                linkEl.title =
-                    "尚未到開始時間：" +
-                    (start.getMonth() + 1) + "/" +
-                    start.getDate() + " " +
-                    String(start.getHours()).padStart(2, "0") + ":" +
-                    String(start.getMinutes()).padStart(2, "0");
-            }
+        document.querySelectorAll('#page-draws .draw-link').forEach(function(linkEl){
+            linkEl.classList.remove('not-started');
+            linkEl.removeAttribute('aria-disabled');
+            linkEl.removeAttribute('tabindex');
+            if (linkEl.textContent.trim() === '尚未開始') linkEl.textContent = '抽獎';
+            linkEl.title = '';
         });
     }
 
@@ -1752,7 +1705,7 @@ function render() {
         }
 
         armAutoDraw(currentItem);
-        window.location.href = currentItem.product.url;
+        window.openFunboxDrawLink(currentItem.product.url);
     }
 
     function completeAndOpenNext() {
@@ -1782,7 +1735,7 @@ function render() {
         if (nextItem && nextItem.product) {
             // 手動備援按鈕仍由使用者手勢開新頁；同時重新啟用自動回來跳下一個。
             armAutoDraw(nextItem);
-            window.location.href = nextItem.product.url;
+            window.openFunboxDrawLink(nextItem.product.url);
         } else {
             autoDrawEnabled = false;
             pendingAutoItem = null;
@@ -1792,7 +1745,7 @@ function render() {
     }
 
     // 讓下方任意一列都能直接成為自動連續抽選的起點。
-    // 同頁跳轉模式：不建立新分頁，直接由目前這一頁進入 lin.ee。
+    // 自動連抽模式：使用新分頁開啟 lin.ee，保留原本抽籤頁。
     window.startAutoDrawFromRow = function (row) {
         if (window.funboxDrawMode !== "auto") return false;
         if (!row) return false;
@@ -1849,8 +1802,8 @@ function render() {
         } catch (e) {}
         setAutoStatus("同頁跳轉模式；抽完關閉 / 返回後有 2 秒可停止");
 
-        // 不開新分頁：目前頁面直接進入抽獎。
-        window.location.href = found.product.url;
+        // 使用新分頁開啟 LINE，保留原本抽籤頁，避免本機 HTML 導向外部網址被瀏覽器封鎖。
+        window.openFunboxDrawLink(found.product.url);
         return true;
     };
 
@@ -2426,8 +2379,7 @@ function render() {
     window.funboxRowStoreHasStarted = rowStoreHasStarted;
 
     window.openDrawRow = function(event, row) {
-    if (!row || row.classList.contains('not-started')) return;
-    if (!rowStoreHasStarted(row)) return;
+    if (!row) return;
 
     const href = row.getAttribute('data-draw-href');
     const id = row.getAttribute('data-draw-id');
@@ -2436,7 +2388,7 @@ function render() {
     // 預設手動模式：只開使用者點的這一筆，不啟動任何自動下一個。
     if (window.funboxDrawMode !== 'auto') {
         window.markDrawVisited(id);
-        window.location.href = href;
+        window.openFunboxDrawLink(href);
         return;
     }
 
@@ -2448,30 +2400,20 @@ function render() {
 
     // 保底：若自動模式尚未初始化，至少仍能正常開啟該筆。
     window.markDrawVisited(id);
-    window.location.href = href;
+    window.openFunboxDrawLink(href);
 };
 
+    // 抽籤商品不因開始時間而鎖定；資料列永遠保持可點擊。
     function syncStoreStartLocks() {
-        document.querySelectorAll('#page-draws .draw-store').forEach(function(store){
-            var sample = store.querySelector('.draw-item');
-            if (!sample) return;
-            var started = rowStoreHasStarted(sample);
-            store.querySelectorAll('.draw-item').forEach(function(row){
-                row.classList.toggle('not-started', !started);
-                if (!started) {
-                    row.setAttribute('aria-disabled', 'true');
-                    row.setAttribute('tabindex', '-1');
-                } else {
-                    row.removeAttribute('aria-disabled');
-                    row.setAttribute('tabindex', '0');
-                }
-            });
+        document.querySelectorAll('#page-draws .draw-item').forEach(function(row){
+            row.classList.remove('not-started');
+            row.removeAttribute('aria-disabled');
+            row.setAttribute('tabindex', '0');
         });
     }
 
     syncStoreStartLocks();
     window.addEventListener('load', syncStoreStartLocks);
-    setInterval(syncStoreStartLocks, 1000);
 
     window.handleDrawRowKey = function(event, row) {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -2480,5 +2422,49 @@ function render() {
     }
 };
 })();
-</script></body>
+</script>
+<script>
+(function(){
+  // 從本機 HTML 開啟 LINE lin.ee 時，改用新分頁，避免 file:// 直接導向外部網址被瀏覽器封鎖。
+  window.openFunboxDrawLink = function(href) {
+    if (!href) return false;
+    var w = window.open(href, "_blank", "noopener,noreferrer");
+    return !!w;
+  };
+
+  window.openDrawRow = function(event, row) {
+    if (!row) return;
+    const href = row.getAttribute('data-draw-href');
+    const id = row.getAttribute('data-draw-id');
+    if (!href || !id) return;
+    if (window.funboxDrawMode !== 'auto') {
+      if (typeof window.markDrawVisited === 'function') window.markDrawVisited(id);
+      window.openFunboxDrawLink(href);
+      return;
+    }
+    if (typeof window.startAutoDrawFromRow === 'function') {
+      const started = window.startAutoDrawFromRow(row);
+      if (started) return;
+    }
+    if (typeof window.markDrawVisited === 'function') window.markDrawVisited(id);
+    window.openFunboxDrawLink(href);
+  };
+  window.handleDrawRowKey = function(event, row) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      window.openDrawRow(event, row);
+    }
+  };
+  function unlockDrawRows(){
+    document.querySelectorAll('#page-draws .draw-item').forEach(function(row){
+      row.classList.remove('not-started');
+      row.removeAttribute('aria-disabled');
+      row.setAttribute('tabindex','0');
+    });
+  }
+  unlockDrawRows();
+  window.addEventListener('load', unlockDrawRows);
+})();
+</script>
+</body>
 </html>
