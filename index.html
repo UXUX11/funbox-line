@@ -799,7 +799,7 @@
   color: #666 !important;
 }
 </style>
-<div class="draw-title-wrap"><h1 class="draw-main-title">10/08 10/09 抽選</h1><div class="draw-last-updated">最後更新：2026/10/07 21:47</div></div>
+<div class="draw-title-wrap"><h1 class="draw-main-title">10/08 10/09 抽選</h1><div class="draw-last-updated">最後更新：2026/10/07 22:05</div></div>
 <div class="draw-mode-panel" id="drawModePanel">
 <div class="draw-mode-title">抽選模式</div>
 <div class="draw-mode-buttons">
@@ -2456,5 +2456,34 @@ function render() {
   window.addEventListener('load', unlockDrawRows);
 })();
 </script>
-</div></body>
+</div><script>
+/* ===== 隱藏測試功能：連點「最後更新」3 次重置抽選灰底 ===== */
+(function(){
+ var tapCount=0,tapTimer=null;
+ function resetDrawGrayState(){
+  try{localStorage.removeItem('visited_draw_links_1002_1003')}catch(e){}
+  try{localStorage.removeItem('funbox_continuous_draw_1002_1003_drawn')}catch(e){}
+  document.querySelectorAll('#page-draws .draw-item.quick-drawn').forEach(function(r){r.classList.remove('quick-drawn')});
+  document.querySelectorAll('#page-draws .draw-link.clicked').forEach(function(l){l.classList.remove('clicked')});
+  try{
+   if(typeof window.syncQuickDrawRegion==='function') window.syncQuickDrawRegion(window.funboxSelectedDrawRegion||'all');
+   if(typeof window.syncQuickDrawProduct==='function') window.syncQuickDrawProduct(window.funboxSelectedDrawProduct||'all');
+   if(typeof window.syncQuickDrawTime==='function') window.syncQuickDrawTime(window.funboxSelectedDrawTime||'all');
+  }catch(e){}
+ }
+ function bind(){
+  var el=document.querySelector('.draw-last-updated');
+  if(!el||el.dataset.grayResetBound==='1') return;
+  el.dataset.grayResetBound='1';
+  el.addEventListener('click',function(){
+   tapCount++; clearTimeout(tapTimer);
+   tapTimer=setTimeout(function(){tapCount=0},900);
+   if(tapCount>=3){tapCount=0;clearTimeout(tapTimer);resetDrawGrayState()}
+  });
+ }
+ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bind); else bind();
+ window.addEventListener('load',bind);
+})();
+</script>
+</body>
 </html>
