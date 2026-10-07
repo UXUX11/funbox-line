@@ -799,7 +799,7 @@
   color: #666 !important;
 }
 </style>
-<div class="draw-title-wrap"><h1 class="draw-main-title">10/08 10/09 抽選</h1><div class="draw-last-updated">最後更新：2026/10/07 19:25</div></div>
+<div class="draw-title-wrap"><h1 class="draw-main-title">10/08 10/09 抽選</h1><div class="draw-last-updated" id="hiddenDrawReset" title="" style="cursor:default;user-select:none;-webkit-user-select:none;">最後更新：2026/10/07 19:25</div></div>
 <div class="draw-mode-panel" id="drawModePanel">
 <div class="draw-mode-title">抽選模式</div>
 <div class="draw-mode-buttons">
@@ -2456,5 +2456,48 @@ function render() {
   window.addEventListener('load', unlockDrawRows);
 })();
 </script>
-</div></body>
+</div>
+<script>
+/* 隱藏測試功能：在「最後更新」文字快速點 3 下，重置所有已變灰的抽選項目。
+   不顯示額外按鈕，避免影響一般使用。 */
+(function () {
+    const el = document.getElementById('hiddenDrawReset');
+    if (!el) return;
+    let taps = 0;
+    let timer = null;
+
+    function resetDrawGrayState() {
+        const keys = [
+            'funbox_continuous_draw_1002_1003_drawn',
+            'visited_draw_links_1002_1003'
+        ];
+        keys.forEach(k => {
+            try { localStorage.removeItem(k); } catch (e) {}
+        });
+
+        document.querySelectorAll('#page-draws .draw-item.quick-drawn').forEach(row => {
+            row.classList.remove('quick-drawn');
+        });
+        document.querySelectorAll('#page-draws .draw-link.clicked').forEach(link => {
+            link.classList.remove('clicked');
+        });
+
+        // 讓原本的同步流程立即把畫面恢復成未抽狀態。
+        try {
+            if (typeof window.restoreDrawVisited === 'function') window.restoreDrawVisited();
+        } catch (e) {}
+    }
+
+    el.addEventListener('click', function () {
+        taps += 1;
+        clearTimeout(timer);
+        timer = setTimeout(() => { taps = 0; }, 1200);
+        if (taps >= 3) {
+            taps = 0;
+            resetDrawGrayState();
+        }
+    });
+})();
+</script>
+</body>
 </html>
