@@ -2430,42 +2430,61 @@ function render() {
 </script>
 
 <script>
-/* 隱藏修復功能：快速點擊「最後更新」文字 3 下，清除已抽選狀態並修復灰底。
-   不顯示額外按鈕，避免影響一般使用。 */
+/* 隱藏修復功能：在「最後更新」文字 2 秒內快速點擊 3 下，重置所有已抽選灰底。
+   同時清除本期與舊版抽選紀錄，避免畫面和自動連抽狀態不同步。 */
 (function () {
+    "use strict";
     const el = document.getElementById('hiddenDrawReset');
     if (!el) return;
+
     let taps = 0;
-    let timer = null;
+    let tapTimer = null;
+    let noticeTimer = null;
+    const originalText = el.textContent;
 
     function resetDrawGrayState() {
+        // 清除目前 11/06-11/07 的紀錄，也一併清除舊版相容 key。
         const keys = [
             'funbox_continuous_draw_1106_1107_drawn',
-            'visited_draw_links_1106_1107'
+            'visited_draw_links_1106_1107',
+            'funbox_continuous_draw_1002_1003_drawn',
+            'visited_draw_links_1002_1003',
+            'funbox_continuous_draw_v9_drawn'
         ];
-        keys.forEach(k => {
-            try { localStorage.removeItem(k); } catch (e) {}
+        keys.forEach(function (key) {
+            try { localStorage.removeItem(key); } catch (e) {}
         });
 
-        document.querySelectorAll('#page-draws .draw-item.quick-drawn').forEach(row => {
+        // 直接移除所有抽選列的灰底 class，避免只清到部分按鈕。
+        document.querySelectorAll('#page-draws .draw-item').forEach(function (row) {
             row.classList.remove('quick-drawn');
-        });
-        document.querySelectorAll('#page-draws .draw-link.clicked').forEach(link => {
-            link.classList.remove('clicked');
+            row.querySelectorAll('.draw-link').forEach(function (link) {
+                link.classList.remove('clicked', 'quick-drawn');
+            });
         });
 
-        // 讓原本的同步流程立即依照清空後的紀錄重新整理灰底狀態。
+        // 呼叫原本的恢復流程，讓畫面與自動連抽重新同步。
         try {
-            if (typeof window.restoreDrawVisited === 'function') window.restoreDrawVisited();
+            if (typeof window.restoreDrawVisited === 'function') {
+                window.restoreDrawVisited();
+            }
         } catch (e) {}
+
+        // 給使用者明確回饋，但不增加任何常駐按鈕。
+        el.textContent = '灰底已重置';
+        if (noticeTimer) clearTimeout(noticeTimer);
+        noticeTimer = setTimeout(function () {
+            el.textContent = originalText;
+        }, 1800);
     }
 
     el.addEventListener('click', function () {
         taps += 1;
-        clearTimeout(timer);
-        timer = setTimeout(() => { taps = 0; }, 1200);
+        clearTimeout(tapTimer);
+        tapTimer = setTimeout(function () { taps = 0; }, 2000);
         if (taps >= 3) {
             taps = 0;
+            clearTimeout(tapTimer);
             resetDrawGrayState();
         }
     });
