@@ -799,7 +799,16 @@
   color: #666 !important;
 }
 </style>
-<div class="draw-title-wrap"><h1 class="draw-main-title">11/06 11/07 抽選</h1><div class="draw-last-updated">最後更新：2026/11/05 19:02</div></div>
+<div class="draw-title-wrap"><h1 class="draw-main-title">11/06 11/07 抽選</h1><div class="draw-last-updated" id="hiddenDrawReset" title="" style="cursor:default;user-select:none;-webkit-user-select:none;">最後更新：2026/11/05 19:02</div>
+<div class="draw-mode-panel" id="drawModePanel">
+<div class="draw-mode-title">抽選模式</div>
+<div class="draw-mode-buttons">
+<button class="draw-mode-btn active" id="drawModeManual" onclick="setDrawMode('manual')" type="button">👆 手動抽選（預設）</button>
+<button class="draw-mode-btn auto" id="drawModeAuto" onclick="setDrawMode('auto')" type="button">⚡ 自動連抽</button>
+</div>
+<div class="draw-mode-desc" id="drawModeDesc">手動模式：點哪一筆就只開哪一筆，不會自動跳下一個。</div>
+</div>
+</div>
 <div class="draw-missing-box"><div class="draw-missing-title">本週未販售陀螺門市</div><div class="draw-missing-row">Funbox-台東店</div></div>
 <div class="draw-filter-btn-group"><button class="filter-btn" onclick="filterDrawRegion('all', this)">全部 (28)</button><button class="filter-btn" onclick="filterDrawRegion('台北市', this)">台北市 (6)</button><button class="filter-btn" onclick="filterDrawRegion('新北市', this)">新北市 (5)</button><button class="filter-btn" onclick="filterDrawRegion('桃園市', this)">桃園市 (1)</button><button class="filter-btn" onclick="filterDrawRegion('新竹市', this)">新竹市 (1)</button><button class="filter-btn" onclick="filterDrawRegion('新竹縣', this)">新竹縣 (1)</button><button class="filter-btn" onclick="filterDrawRegion('台中市', this)">台中市 (2)</button><button class="filter-btn" onclick="filterDrawRegion('嘉義市', this)">嘉義市 (2)</button><button class="filter-btn" onclick="filterDrawRegion('台南市', this)">台南市 (2)</button><button class="filter-btn" onclick="filterDrawRegion('高雄市', this)">高雄市 (5)</button><button class="filter-btn" onclick="filterDrawRegion('屏東縣', this)">屏東縣 (2)</button><button class="filter-btn" onclick="filterDrawRegion('宜蘭縣', this)">宜蘭縣 (1)</button></div>
 <div class="draw-secondary-filters"><div class="product-filter-wrap"><label class="product-filter-label" for="drawProductFilter">商品篩選：</label><select class="product-filter-select" id="drawProductFilter" onchange="filterDrawProduct(this.value)"><option value="all">全部商品</option><option value="BX-00">BX-00</option><option value="BX-09">BX-09</option><option value="BX-10">BX-10</option><option value="BX-26">BX-26</option><option value="BX-37">BX-37</option><option value="UX-00">UX-00</option><option value="UX-01">UX-01</option><option value="UX-03">UX-03</option><option value="UX-11">UX-11</option><option value="UX-13">UX-13</option><option value="UX-14">UX-14</option><option value="UX-15">UX-15</option><option value="UX-16">UX-16</option><option value="UX-17">UX-17</option><option value="UX-19">UX-19</option><option value="UX-20">UX-20</option><option value="UX-21">UX-21</option><option value="CX-00">CX-00</option><option value="CX-01">CX-01</option><option value="CX-02">CX-02</option><option value="CX-03">CX-03</option><option value="CX-05">CX-05</option><option value="CX-08">CX-08</option><option value="CX-11">CX-11</option><option value="CX-13">CX-13</option><option value="CX-14">CX-14</option><option value="CX-15">CX-15</option><option value="CX-16">CX-16</option><option value="CX-17">CX-17</option><option value="CX-19">CX-19</option><option value="CX-53">CX-53</option><option value="BXG-01">BXG-01</option><option value="BXG-04">BXG-04</option><option value="BX-08">BX-08</option><option value="BX-13">BX-13</option><option value="BX-38">BX-38</option><option value="BX-44">BX-44</option><option value="BX-45">BX-45</option><option value="BX-53">BX-53</option><option value="UX-02">UX-02</option><option value="CX-06">CX-06</option><option value="CX-07">CX-07</option><option value="CX-12">CX-12</option><option value="BXG-22">BXG-22</option></select></div><div class="time-filter-wrap"><div class="product-filter-label">時間篩選：</div><div class="time-filter-btn-group"><button class="time-filter-btn active" data-time-filter="all" onclick="filterDrawTime('all', this)">全部時間</button><button class="time-filter-btn" data-time-filter="10:00" onclick="filterDrawTime('10:00', this)">10:00</button><button class="time-filter-btn" data-time-filter="11:00" onclick="filterDrawTime('11:00', this)">11:00</button><button class="time-filter-btn" data-time-filter="11:11" onclick="filterDrawTime('11:11', this)">11:11</button><button class="time-filter-btn" data-time-filter="12:00" onclick="filterDrawTime('12:00', this)">12:00</button><button class="time-filter-btn" data-time-filter="開店" onclick="filterDrawTime('開店', this)">開店</button></div></div></div>
@@ -2449,6 +2458,49 @@ function render() {
   }
   unlockDrawRows();
   window.addEventListener('load', unlockDrawRows);
+})();
+</script>
+
+<script>
+/* 隱藏修復功能：快速點擊「最後更新」文字 3 下，清除已抽選狀態並修復灰底。
+   不顯示額外按鈕，避免影響一般使用。 */
+(function () {
+    const el = document.getElementById('hiddenDrawReset');
+    if (!el) return;
+    let taps = 0;
+    let timer = null;
+
+    function resetDrawGrayState() {
+        const keys = [
+            'funbox_continuous_draw_1106_1107_drawn',
+            'visited_draw_links_1106_1107'
+        ];
+        keys.forEach(k => {
+            try { localStorage.removeItem(k); } catch (e) {}
+        });
+
+        document.querySelectorAll('#page-draws .draw-item.quick-drawn').forEach(row => {
+            row.classList.remove('quick-drawn');
+        });
+        document.querySelectorAll('#page-draws .draw-link.clicked').forEach(link => {
+            link.classList.remove('clicked');
+        });
+
+        // 讓原本的同步流程立即依照清空後的紀錄重新整理灰底狀態。
+        try {
+            if (typeof window.restoreDrawVisited === 'function') window.restoreDrawVisited();
+        } catch (e) {}
+    }
+
+    el.addEventListener('click', function () {
+        taps += 1;
+        clearTimeout(timer);
+        timer = setTimeout(() => { taps = 0; }, 1200);
+        if (taps >= 3) {
+            taps = 0;
+            resetDrawGrayState();
+        }
+    });
 })();
 </script>
 </body>
