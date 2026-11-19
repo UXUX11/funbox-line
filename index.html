@@ -592,6 +592,27 @@
     line-height: 1.55;
     color: #666;
 }
+.draw-auto-delay-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 11px 0 2px;
+    color: #555;
+    font-size: 13px;
+    font-weight: 700;
+}
+.draw-auto-delay-row select {
+    min-width: 126px;
+    padding: 7px 10px;
+    border: 1px solid #cfd6df;
+    border-radius: 8px;
+    background: #fff;
+    color: #222;
+    font-size: 14px;
+    font-weight: 700;
+}
 @media (max-width: 520px) {
     .draw-mode-panel { margin-left: 2px; margin-right: 2px; }
     .draw-mode-btn { font-size: 13px; padding: 10px 7px; }
@@ -1052,7 +1073,7 @@ html.theme-dark .continuous-draw-skip {
 </style>
 <div class="draw-title-wrap">
 <div class="draw-header-actions">
-<div class="draw-last-updated" id="hiddenDrawReset" style="cursor:default;user-select:none;-webkit-user-select:none;" title="2 秒內快速點擊 3 下可重置所有已抽選灰底">最後更新：2026/11/19 20:59</div>
+<div class="draw-last-updated" id="hiddenDrawReset" style="cursor:default;user-select:none;-webkit-user-select:none;" title="2 秒內快速點擊 3 下可重置所有已抽選灰底">最後更新：2026/11/19 21:22</div>
 <button aria-checked="false" aria-label="切換暗黑模式" class="theme-toggle" id="themeToggle" role="switch" type="button">
 <span aria-hidden="true" class="theme-toggle-icon" id="themeToggleIcon">🌙</span>
 <span class="theme-toggle-label" id="themeToggleLabel">暗黑模式</span>
@@ -1065,6 +1086,18 @@ html.theme-dark .continuous-draw-skip {
 <div class="draw-mode-buttons">
 <button class="draw-mode-btn active" id="drawModeManual" onclick="setDrawMode('manual')" type="button">👆 手動抽選（預設）</button>
 <button class="draw-mode-btn auto" id="drawModeAuto" onclick="setDrawMode('auto')" type="button">⚡ 自動連抽</button>
+</div>
+<div class="draw-auto-delay-row">
+<label for="drawAutoDelaySelect">自動下一抽間隔：</label>
+<select id="drawAutoDelaySelect" aria-label="自動下一抽間隔">
+<option value="500">0.5 秒</option>
+<option value="1000">1 秒</option>
+<option value="1500">1.5 秒</option>
+<option value="2000" selected>2 秒（預設）</option>
+<option value="2500">2.5 秒</option>
+<option value="3000">3 秒</option>
+<option value="5000">5 秒</option>
+</select>
 </div>
 <div class="draw-mode-desc" id="drawModeDesc">手動模式：點哪一筆就只開哪一筆，不會自動跳下一個。</div>
 <div aria-live="polite" id="continuousDrawAutoStatus" role="status" style="margin-top:8px;text-align:center;font-size:12px;line-height:1.5;color:#666;">自動偵測：目前為手動模式</div>
@@ -1449,7 +1482,15 @@ html.theme-dark .continuous-draw-skip {
     var returnHandling = false;
     var lastAutoOpenAt = 0;
     var AUTO_RETURN_MIN_MS = 700;
+    var AUTO_NEXT_DELAY_KEY = "funbox_auto_next_delay_ms";
+    var AUTO_NEXT_DELAY_OPTIONS = [500, 1000, 1500, 2000, 2500, 3000, 5000];
     var AUTO_NEXT_DELAY_MS = 2000;
+    try {
+        var savedAutoNextDelay = parseInt(localStorage.getItem(AUTO_NEXT_DELAY_KEY), 10);
+        if (AUTO_NEXT_DELAY_OPTIONS.indexOf(savedAutoNextDelay) !== -1) {
+            AUTO_NEXT_DELAY_MS = savedAutoNextDelay;
+        }
+    } catch (e) {}
     var autoNextTimer = null;
     var autoCountdownTimer = null;
 
@@ -1494,6 +1535,25 @@ html.theme-dark .continuous-draw-skip {
     // 預設一定是手動模式。只有使用者明確切到「自動連抽」才會啟用連續跳轉。
     window.funboxDrawMode = "manual";
 
+    function formatAutoDelay(ms) {
+        var seconds = ms / 1000;
+        return (Number.isInteger(seconds) ? seconds.toFixed(0) : seconds.toFixed(1)) + " 秒";
+    }
+
+    function setAutoNextDelay(value) {
+        var delay = parseInt(value, 10);
+        if (AUTO_NEXT_DELAY_OPTIONS.indexOf(delay) === -1) return;
+
+        AUTO_NEXT_DELAY_MS = delay;
+        try {
+            localStorage.setItem(AUTO_NEXT_DELAY_KEY, String(delay));
+        } catch (e) {}
+
+        var select = $id("drawAutoDelaySelect");
+        if (select) select.value = String(delay);
+        updateDrawModeUi();
+    }
+
     function updateDrawModeUi() {
         var manualBtn = $id("drawModeManual");
         var autoBtn = $id("drawModeAuto");
@@ -1504,7 +1564,7 @@ html.theme-dark .continuous-draw-skip {
         if (autoBtn) autoBtn.classList.toggle("active", isAuto);
         if (desc) {
             desc.textContent = isAuto
-                ? "自動模式：從你點的那一筆開始，抽完返回後等 2 秒，再自動找下一個沒灰底的項目。"
+                ? "自動模式：從你點的那一筆開始，抽完返回後等待 " + formatAutoDelay(AUTO_NEXT_DELAY_MS) + "，再自動找下一個沒灰底的項目。"
                 : "手動模式：點哪一筆就只開哪一筆，不會自動跳下一個。";
         }
     }
@@ -1975,23 +2035,26 @@ function render() {
     function scheduleNextAutomatically(item) {
         clearAutoNextTimers();
 
-        var remaining = Math.ceil(AUTO_NEXT_DELAY_MS / 1000);
-        setAutoStatus("已完成；" + remaining + " 秒後開啟下一個（可按停止）");
-
+        var scheduledDelay = AUTO_NEXT_DELAY_MS;
+        var deadline = Date.now() + scheduledDelay;
         var floatingStop = $id("continuousDrawFloatingStop");
-        if (floatingStop) {
-            floatingStop.textContent = "⏹ 停止（" + remaining + "秒）";
-            floatingStop.style.display = "block";
+
+        function updateCountdown() {
+            var remainingMs = Math.max(0, deadline - Date.now());
+            if (remainingMs <= 0 || !autoDrawEnabled) return;
+
+            var remainingSeconds = Math.ceil(remainingMs / 100) / 10;
+            var remainingText = Number.isInteger(remainingSeconds)
+                ? remainingSeconds.toFixed(0)
+                : remainingSeconds.toFixed(1);
+            setAutoStatus("已完成；" + remainingText + " 秒後開啟下一個（可按停止）");
+            var btn = $id("continuousDrawFloatingStop");
+            if (btn) btn.textContent = "⏹ 停止（" + remainingText + "秒）";
         }
 
-        autoCountdownTimer = window.setInterval(function () {
-            remaining -= 1;
-            if (remaining > 0 && autoDrawEnabled) {
-                setAutoStatus("已完成；" + remaining + " 秒後開啟下一個（可按停止）");
-                var btn = $id("continuousDrawFloatingStop");
-                if (btn) btn.textContent = "⏹ 停止（" + remaining + "秒）";
-            }
-        }, 1000);
+        if (floatingStop) floatingStop.style.display = "block";
+        updateCountdown();
+        autoCountdownTimer = window.setInterval(updateCountdown, 100);
 
         autoNextTimer = window.setTimeout(function () {
             clearAutoNextTimers();
@@ -2003,7 +2066,7 @@ function render() {
             if (btn) btn.textContent = "⏹ 停止自動跳轉";
             returnHandling = false;
             openNextAutomatically(item);
-        }, AUTO_NEXT_DELAY_MS);
+        }, scheduledDelay);
     }
 
     function handleReturnFromDraw() {
@@ -2151,7 +2214,7 @@ function render() {
         try {
             sessionStorage.setItem("funbox_auto_draw_lower_sequence", "1");
         } catch (e) {}
-        setAutoStatus("已開啟第一筆；抽完請關閉抽選分頁或切回本頁，2 秒後會開啟下一筆");
+        setAutoStatus("已開啟第一筆；抽完請關閉抽選分頁或切回本頁，" + formatAutoDelay(AUTO_NEXT_DELAY_MS) + "後會開啟下一筆");
 
         // 使用新分頁開啟 LINE，保留原本抽籤頁。
         // 若瀏覽器將新分頁放在背景，請手動切回本頁以觸發下一筆。
@@ -2180,7 +2243,7 @@ function render() {
 
     // 同頁模式返回 index 時，原本的 JavaScript 已被重新載入，
     // 因此用 sessionStorage 找回「剛才正在抽的那一筆」。
-    // 找回後才把它標成完成，再提供 2 秒停止時間。
+    // 找回後才把它標成完成，再依使用者設定的間隔倒數。
     function resumeSamePageAutoDrawIfNeeded() {
         var active = false;
         var pendingUrl = "";
@@ -2234,7 +2297,7 @@ function render() {
             return true;
         }
 
-        // 先清掉上一筆 pending；2 秒到時 openNextAutomatically 會寫入下一筆。
+        // 先清掉上一筆 pending；選定間隔到時 openNextAutomatically 會寫入下一筆。
         try {
             sessionStorage.removeItem("funbox_auto_draw_pending_url");
         } catch (e) {}
@@ -2311,6 +2374,15 @@ function render() {
         hookTopProductFilter();
         hookTopTimeFilter();
 
+        var autoDelaySelect = $id("drawAutoDelaySelect");
+        if (autoDelaySelect) {
+            autoDelaySelect.value = String(AUTO_NEXT_DELAY_MS);
+            autoDelaySelect.addEventListener("change", function () {
+                setAutoNextDelay(this.value);
+                setAutoStatus("下一抽間隔已設定為 " + formatAutoDelay(AUTO_NEXT_DELAY_MS));
+            });
+        }
+
         // 一般進入頁面一律預設手動；如果稍後偵測到有效的自動連抽 session，
         // resumeSamePageAutoDrawIfNeeded() 會再切回自動模式。
         window.funboxDrawMode = "manual";
@@ -2353,7 +2425,7 @@ function render() {
         updateAutoControls();
         setAutoStatus("目前為手動模式；切換自動連抽後，點選商品即可開始");
 
-        // 如果剛從同頁抽獎返回，這裡會恢復上一筆並開始 2 秒倒數。
+        // 如果剛從同頁抽獎返回，這裡會恢復上一筆並開始自訂間隔倒數。
         // 成功恢復後不需要依賴 focus / visibilitychange 才能續抽。
         resumeSamePageAutoDrawIfNeeded();
 
